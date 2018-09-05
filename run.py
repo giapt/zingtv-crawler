@@ -62,14 +62,13 @@ def getMp4(url):
 	text = text.strip(" ")
 	origin_text = text
 
-	first_po = find_str(text, 'zPlayer.Player')
-	text = text[(first_po):]
 	first_po = find_str(text, 'playlist=[{\ntitle')
 	json_string = text[first_po+9:]
 	second_po = find_str(json_string, '}]')
 	json_string = json_string[:second_po+2]
-
+	# print json_string
 	link_list = re.findall(urlmarker.WEB_URL_REGEX,json_string)
+	# print link_list
 	link_download = 'http://' + link_list[len(link_list)-1]
 	print link_download
 	download(link_download, 'download/' + folder_name + '/' + slug_title + '.mp4')
@@ -80,15 +79,19 @@ def getListPage(url):
 	result = requests.get(url)
 	soup = BeautifulSoup(result.text, "html.parser")
 	ul = soup.find("ul", class_="pagination")
-	list_li = ul.findAll("li")
-	last_li = list_li[len(list_li)-1]
-	a_tag = last_li.find("a")
-	url = a_tag.get("href")
-	page_number = url[len(url)-1:]
-	base_url = "https://tv.zing.vn/" + url[:len(url)-1]
-	for x in xrange(1,int(page_number)+1):
-		list_link_page.append(base_url+str(x))
+	if ul is not None:
+		list_li = ul.findAll("li")
+		last_li = list_li[len(list_li)-1]
+		a_tag = last_li.find("a")
+		url = a_tag.get("href")
+		page_number = url[len(url)-1:]
+		base_url = "https://tv.zing.vn/" + url[:len(url)-1]
+		for x in xrange(1,int(page_number)+1):
+			list_link_page.append(base_url+str(x))
+			pass
 		pass
+	else:
+		list_link_page.append(url)
 	url_path = urlparse.urlparse(url).path
 	paths = os.path.split(url_path)
 	folder_name = str(paths[1])
