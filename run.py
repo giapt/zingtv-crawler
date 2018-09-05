@@ -69,7 +69,11 @@ def getMp4(url):
 	# print json_string
 	link_list = re.findall(urlmarker.WEB_URL_REGEX,json_string)
 	# print link_list
-	link_download = 'http://' + link_list[len(link_list)-1]
+	link_download = link_list[len(link_list)-1]
+	if "https" not in link_download:
+		link_download = 'https://' + link_download
+		pass
+	
 	print link_download
 	download(link_download, 'download/' + folder_name + '/' + slug_title + '.mp4')
 	print datetime.now()-startTime
